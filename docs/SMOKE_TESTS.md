@@ -7,6 +7,7 @@ Use this after each production deploy. Track pass/fail in your runbook.
 - `DATABASE_URL`, `AUTH_SECRET`, and `AUTH_URL` (or `NEXTAUTH_URL`) are set on the server.
 - `NODE_ENV=production`.
 - `ALLOW_DEMO_DRIVER_EMPLOYEE_AUTH` is **unset** or `false` in production unless you intentionally run a staging-style demo.
+- When demo auth is off, **Driver** and **Employee** rows must have **`loginPinHash`** set (bcrypt of the PIN you choose). Until then, mobile login returns invalid credentials. Use a one-off script, Prisma Studio, or a future admin UI to set hashes.
 
 ## Smoke checklist
 
