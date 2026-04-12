@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-Tenant Core Layer
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  domain      String?  @unique
+  plan        PlanTier @default(BASIC)
+  status      String   @default("active") // active, suspended
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  employees   Employee[]
+  drivers     Driver[]
+  vehicles    Vehicle[]
+  trips       Trip[]
+  shifts      Shift[]
+  invoices    Invoice[]
+  auditLogs   AuditLog[]
+}
+
+enum PlanTier {
+  FREE
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}
+
+// User Layer (Admins & Managers)
+model User {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(MANAGER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+enum UserRole {
+  SUPER_ADMIN // System owner (us)
+  ADMIN       // Tenant owner
+  MANAGER     // Tenant transport manager
+}
+
+// Operational Elements
+model Employee {
+  id             String   @id @default(uuid())
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  email          String   @unique
+  name           String
+  department     String?
+  pickupLocation String?
+  latitude       Float?
+  longitude      Float?
+  shift          String?
+  status         String   @default("active") // active, inactive
+  /// Bcrypt hash of mobile/web PIN when set; otherwise legacy demo rules only if ALLOW_DEMO_DRIVER_EMPLOYEE_AUTH is enabled (non-prod or explicit).
+  loginPinHash   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  passengers     TripPassenger[]
+
+  @@index([tenantId])
+}
+
+model Driver {
+  id            String   @id @default(uuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name          String
+  phone         String
+  licenseNumber String   @unique
+  /// Bcrypt hash of mobile/web PIN when set; otherwise legacy demo rules only if ALLOW_DEMO_DRIVER_EMPLOYEE_AUTH is enabled (non-prod or explicit).
+  loginPinHash  String?
+  rating        Float    @default(5.0)
+  status        String   @default("available") // available, on-trip, offline
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  trips         Trip[]
+
+  @@index([tenantId])
+}
+
+model Vehicle {
+  id            String   @id @default(uuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  model         String
+  plateNumber   String   @unique
+  capacity      Int
+  type          String   // sedan, suv, van
+  status        String   @default("active") // active, maintenance
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  trips         Trip[]
+
+  @@index([tenantId])
+}
+
+model Trip {
+  id            String   @id @default(uuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  driverId      String
+  driver        Driver   @relation(fields: [driverId], references: [id])
+  vehicleId     String
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id])
+  status        TripStatus @default(SCHEDULED)
+  scheduledTime DateTime
+  startTime     DateTime?
+  endTime       DateTime?
+  startLocation String?
+  endLocation   String?
+  
+  passengers    TripPassenger[]
+
+  @@index([tenantId])
+  @@index([driverId])
+}
+
+model TripPassenger {
+  id            String   @id @default(uuid())
+  tripId        String
+  trip          Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  employeeId    String
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  status        String   @default("pending") // pending, picked_up, dropped_off, missed
+  
+  @@unique([tripId, employeeId])
+}
+
+enum TripStatus {
+  SCHEDULED
+  EN_ROUTE
+  COMPLETED
+  CANCELLED
+}
+
+// Phase 4: Extended Operational Models
+
+model Shift {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String   // Morning, General, Night
+  startTime   String   // "06:00"
+  endTime     String   // "14:00"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  amount      Float
+  status      String   @default("pending") // pending, paid, overdue
+  dueDate     DateTime
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId      String   // Can be Admin or SuperAdmin
+  action      String   // "CREATED_USER", "GENERATED_TRIPS", etc.
+  details     String?  // JSON stringified details
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId])
+}

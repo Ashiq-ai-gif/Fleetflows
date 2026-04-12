@@ -1,0 +1,1948 @@
+​I carefully analyzed your uploaded document . It describes a​​Corporate Employee​
+​Transport Management System​​used by companies to manage​​employee cab​
+​transportation, automate trip planning, provide live tracking, safety alerts, and generate​
+​billing reports.​
+​Below is a​​client-ready documentation​​with:​
+​●​
+​●​
+​●​
+​●​
+​●​
+​●​
+​●​
+
+​System architecture​
+​Tech stack​
+​UI modules​
+​Database design​
+​Features​
+​Flow diagrams​
+​Development phases​
+
+​Corporate Employee Transport​
+​Management System​
+​Complete Software Architecture & Development Plan​
+
+​1. Project Overview​
+​The​​Corporate Employee Transport Management System​​(ETMS)​​is a cloud-based​
+​platform that automates the entire employee transportation process for companies.​
+​It replaces manual systems like Excel sheets, driver calls, and manual route planning.​
+​According to the uploaded document, the system manages:​
+
+​●​
+​●​
+​●​
+​●​
+​●​
+​●​
+
+​Employee pickup & drop​
+​Driver assignment​
+​Vehicle tracking​
+​Route planning​
+​SOS safety alerts​
+​Reporting & billing​
+
+​Core Objective​
+​Provide a​​secure, automated, real-time transport management​​system​​for organizations​
+​with employee transportation needs.​
+
+​2. Users of the System​
+​The document shows​​three primary user types​.​
+​User​
+​Super Admin​
+
+​Platform​
+​Web Panel​
+
+​Company Admin​ ​Web Panel​
+
+​Purpose​
+​Manage​
+​companies​
+​Manage transport​
+
+​Driver​
+
+​Mobile App​ ​Execute trips​
+
+​Employee​
+
+​Mobile App​ ​Track cab​
+
+​3. High Level System Architecture​
+​+----------------------+​
+|​ Super Admin
+|​
+|​ (Platform Owner) |​
+​+----------+-----------+​
+|​​
+|​​
+​Web Admin Panel​
+|​​
+|​​
+​+--------------+--------------+​
+
+|​
+|​
+​Company Transport Team
+Reporting System​
+|​
+|​
+|​​
+​+-------+-------+​
+|​
+|​
+​Driver Mobile App Employee Mobile App​
+|​
+|​
+|​
+|​
+​+-------+-------+​
+|​​
+​API Backend Server​
+|​​
+​Real-Time Services​
+|​​
+​Database​
+
+​4. Recommended Technology Stack​
+​Frontend (Admin Dashboard)​
+​Best choice:​
+​Next.js (React)​
+​Tailwind CSS​
+​TypeScript​
+​Redux Toolkit​
+​React Query​
+​Chart.js​
+
+​Why:​
+​●​ ​Fast dashboard UI​
+​●​ ​SEO support​
+​●​ ​Real-time updates​
+
+​Mobile Apps​
+​Two apps:​
+​1.​ ​Driver App​
+
+​2.​ ​Employee App​
+​Best option:​
+​React Native​
+​or​
+​Flutter​
+
+​Features needed:​
+​●​
+​●​
+​●​
+​●​
+
+​GPS tracking​
+​Push notifications​
+​Maps navigation​
+​SOS alerts​
+
+​Backend​
+​Recommended:​
+​Python or Node​
+​Django + Django REST Framework​
+​Celery​
+​Redis​
+
+​Why:​
+​●​ ​Secure​
+​●​ ​Scalable​
+​●​ ​Easy API development​
+
+​Database​
+​Recommended:​
+​PostgreSQL​
+
+​With extensions:​
+​PostGIS​
+
+​Reason:​
+
+​Location queries for​​map-based pickup points​.​
+
+​Real Time Tracking​
+​Use:​
+​WebSockets​
+​Socket.IO​
+​or​
+​Firebase Realtime DB​
+
+​Purpose:​
+​●​ ​Live vehicle location​
+​●​ ​Live admin dashboard​
+
+​Maps Integration​
+​Google Maps API​
+​Mapbox​
+
+​Features:​
+​●​ ​Route optimization​
+​●​ ​Navigation​
+​●​ ​Distance calculation​
+
+​Notifications​
+​Firebase Cloud Messaging​
+​Twilio SMS​
+​Email (SendGrid)​
+
+​Used for:​
+​●​ ​Cab arrival alert​
+​●​ ​SOS alerts​
+​●​ ​Admin notifications​
+
+​5. Core System Modules​
+​1. Super Admin Panel​
+​Functions:​
+​●​
+​●​
+​●​
+​●​
+
+​Create company accounts​
+​Manage subscriptions​
+​Monitor usage​
+​Platform analytics​
+
+​Features​
+​Company Management​
+​Billing Plans​
+​System Logs​
+​Admin Controls​
+
+​2. Company Admin Dashboard​
+​Main operational panel.​
+​Modules:​
+​Dashboard​
+​Employee Management​
+​Driver Management​
+​Vehicle Management​
+​Shift Management​
+​Trip Planning​
+​Route Optimization​
+​Live Tracking​
+​Reports & Billing​
+
+​6. System Workflow (Full Process)​
+​Based on the document flow.​
+
+​System Flow Diagram​
+​Company Onboarding​
+
+|​​
+​v​
+​Add Employees + Drivers + Vehicles​
+|​​
+​v​
+​Assign Shift Timing​
+|​​
+​v​
+​Generate Daily Roster​
+|​​
+​v​
+​Auto Trip Creation​
+|​​
+​v​
+​Driver Accepts Trip​
+|​​
+​v​
+​Trip Starts (Live Tracking)​
+|​​
+​v​
+​Employee Pickup​
+|​​
+​v​
+​Employee Drop​
+|​​
+​v​
+​Trip Completed​
+|​​
+​v​
+​Reports Generated​
+
+​This matches the​​step-by-step system process described​​in the document​.​
+
+​7. Trip Generation Algorithm​
+​System automatically groups employees.​
+​Logic:​
+​1 Fetch employees by shift​
+​2 Sort by location​
+​3 Cluster nearby employees​
+​4 Assign vehicle capacity​
+​5 Assign available driver​
+
+​6 Generate optimal route​
+
+​Example​
+​Shift: 9:00 AM​
+​Employees: 32​
+​Vehicle capacity: 6​
+​Trips generated = 6​
+
+​8. Live Tracking Architecture​
+​Driver GPS​
+|​​
+​v​
+​Mobile App​
+|​​
+​v​
+​Location API​
+|​​
+​v​
+​WebSocket Server​
+|​​
+​v​
+​Admin Dashboard Map​
+|​​
+​v​
+​Employee App Map​
+
+​Update frequency:​
+​Every 5 seconds​
+
+​9. Safety System (SOS)​
+​Important feature from the document.​
+​When driver presses SOS:​
+
+​Driver App​
+|​​
+​v​
+​SOS API Trigger​
+|​​
+​v​
+​Alert System​
+|​​
+​+---- SMS to Manager​
+|​​
+​+---- Admin Dashboard Alert​
+|​​
+​+---- Save GPS Location​
+
+​This provides​​emergency safety monitoring​.​
+
+​10. Database Design​
+​Core Tables​
+​companies​
+​users​
+​employees​
+​drivers​
+​vehicles​
+​departments​
+​shifts​
+​routes​
+​trips​
+​trip_stops​
+​driver_locations​
+​alerts​
+​reports​
+i​nvoices​
+
+​Example ER Diagram​
+​Company​
+|​​
+|​---- Employees​
+|​​
+|​---- Drivers​
+
+|​​
+|​---- Vehicles​
+|​​
+|​---- Shifts​
+|​​
+|​---- Trips​
+|​​
+|​---- Trip Stops​
+|​​
+|​---- Driver​
+|​​
+|​---- Vehicle​
+
+​11. Admin Dashboard Screens​
+​Main screens:​
+​Dashboard​
+​Employee List​
+​Driver List​
+​Vehicle List​
+​Trip Planner​
+​Live Map​
+​Shift Manager​
+​Reports​
+​Billing​
+
+​12. Mobile App Features​
+​Driver App​
+​Features:​
+​Login​
+​Today's Trips​
+​Route Navigation​
+​Start Trip​
+​Pickup Confirmation​
+​Drop Confirmation​
+​SOS Button​
+
+​Trip History​
+
+​Employee App​
+​Features:​
+​Login​
+​Trip Notifications​
+​Driver Details​
+​Vehicle Details​
+​Live Map Tracking​
+​ETA​
+​Trip History​
+​Emergency Contact​
+
+​13. Reporting & Analytics​
+​At end of month system generates:​
+​●​
+​●​
+​●​
+​●​
+​●​
+
+​Total trips​
+​Total distance​
+​Driver performance​
+​Delay reports​
+​Cost per employee​
+
+​These are mentioned in the final step of the document.​
+
+​14. Security Design​
+​Security layers:​
+​JWT Authentication​
+​Role Based Access Control​
+​HTTPS​
+​Encrypted Passwords​
+​Audit Logs​
+​API Rate Limiting​
+
+​15. Deployment Architecture​
+​Cloud setup:​
+​Frontend (Next.js)​
+|​​
+​v​
+​CDN (Cloudflare)​
+|​​
+​v​
+​API Server (Django)​
+|​​
+​v​
+​Redis + Celery​
+|​​
+​v​
+​PostgreSQL Database​
+
+​Hosting options​
+​AWS​
+​DigitalOcean​
+​Azure​
+
+​16. Estimated Development Timeline​
+​Phase​
+​Planning​
+​UI/UX Design​
+​Backend Development​
+​Mobile Apps​
+​Integration​
+​Testing​
+​Deployment​
+​Total​
+​4 weeks​
+
+​17​
+​18. Project Folder Structure​
+​Backend​
+​transport-system​
+|​​
+|​-- users​
+|​-- employees​
+|​-- drivers​
+|​-- vehicles​
+|​-- trips​
+|​-- routes​
+|​-- notifications​
+|​-- billing​
+
+​19. UI/UX Design Concept​
+​Admin Dashboard​
+​Left Sidebar​
+​Dashboard​
+​Employees​
+​Drivers​
+​Vehicles​
+​Trips​
+​Reports​
+​Billing​
+
+​Map centered interface.​
+
+​20.​​This system will provide:​
+​✔ Automated employee trip planning​
+​✔ Real-time vehicle tracking​
+​✔ Driver mobile operations​
+​✔ Employee trip tracking​
+​✔ Safety alerts (SOS)​
+​✔ Detailed analytics & billing​
+
+​21. Configurable Transport Rules Engine​
+​Overview​
+​The platform includes a​​Configurable Transport Rules​​Engine​​that allows organizations to​
+​define operational constraints for employee transportation.​
+​This system ensures that​​transport planning, trip​​generation, and route optimization​
+​follow company-specific policies​.​
+​Each organization (tenant) can configure their own rules independently.​
+​This is essential in multi-tenant systems because​​different companies have different​
+​transport policies​.​
+
+​Transport Rules Engine Architecture​
+​Company Admin Dashboard​
+|​​
+​v​
+​Transport Rules Configuration​
+|​​
+
+​v​
+​Rules Engine​
+|​​
+​v​
+​Trip Generation Service​
+|​​
+​v​
+​Route Optimization Engine​
+
+​Rules are applied​​before trips are generated​.​
+
+​Configurable Transport Rules​
+​The following operational rules can be configured per organization.​
+
+​Rule Category​
+
+​Description​
+
+​Pickup Time Window​
+
+​Define how early employees can be picked before​
+​shift​
+
+​Female Safety Rule​
+
+​Female employee cannot be last drop in night shift​
+
+​Vehicle Capacity Utilization​
+
+​Minimum and maximum occupancy rules​
+
+​Maximum Route Duration​
+
+​Limit total travel time​
+
+​Driver Shift Limits​
+
+​Restrict driver working hours​
+
+​Maximum Pickup Distance​
+
+​Limit distance deviation from route​
+
+​Last Pickup Rule​
+
+​Prevent unsafe pickup sequences​
+
+​Night Shift Safety​
+
+​Mandatory security escort policies​
+
+​Example Rule Configuration​
+​Example:​
+​Shift Start Time: 9:00 AM​
+​Pickup Window: 30 minutes before shift​
+​Vehicle Capacity: 6​
+​Minimum Utilization: 4 employees​
+​Max Route Duration: 60 minutes​
+​Driver Max Working Hours: 10 hours​
+
+​Female Safety Policy Example​
+​For night shifts:​
+​Rule:​
+​Female employee cannot be the last drop.​
+
+​Solution:​
+​System reorders route automatically.​
+
+​OR​
+​Assign security escort.​
+
+​Flow:​
+​Trip Generation​
+|​​
+​Check Safety Rules​
+|​​
+​If violation found​
+|​​
+​Route Adjusted​
+
+​Rule Storage Model (Database)​
+​Example tables:​
+​transport_rules​
+​rule_types​
+​organization_rules​
+​rule_conditions​
+​rule_values​
+
+​Example structure:​
+
+​id​ ​organization_id​
+
+​rule_type​
+
+​rule_value​
+
+​1​
+
+​201​
+
+​pickup_window​
+
+​30 minutes​
+
+​2​
+
+​201​
+
+​max_route_duration​
+
+​60 minutes​
+
+​3​
+
+​201​
+
+​female_last_drop_allowed​ ​false​
+
+​Rule Processing Flow​
+​Trip Request Generated​
+|​​
+​v​
+​Load Organization Rules​
+|​​
+​v​
+​Validate Constraints​
+|​​
+​v​
+​Apply Route Optimization​
+|​​
+​v​
+​Generate Final Trip Plan​
+
+​Example Trip Generation With Rules​
+
+​Input:​
+​Employees = 25​
+​Shift = 9 AM​
+​Vehicles = 5​
+​Capacity = 6​
+
+​Constraints applied:​
+​Pickup window = 30 minutes​
+​Max route duration = 60 minutes​
+​Female last drop = not allowed​
+
+​Result:​
+​Trips Generated = 5​
+​Routes Optimized​
+​Rules satisfied​
+
+​Rules Engine Technology​
+​Implementation​
+​Recommended implementation:​
+​Backend: Django Rules Engine​
+​Processing: Celery Workers​
+​Caching: Redis​
+​Optimization: Python OR-Tools​
+
+​Possible optimization libraries:​
+​Google OR Tools​
+​OSRM​
+​GraphHopper​
+
+​These allow​​vehicle routing with constraints​.​
+
+​Admin UI for Rule Configuration​
+​Transport managers can configure rules through the dashboard.​
+​Example UI:​
+​Transport Settings​
+|​​
+|​---- Pickup Window​
+|​---- Female Safety Rule​
+|​---- Route Duration Limit​
+|​---- Vehicle Capacity Rules​
+|​---- Driver Work Hours​
+
+​Each organization can define its own policies.​
+
+​Benefits of Rules Engine​
+​The rules engine ensures:​
+​✔ Safety compliance​
+​✔ Policy enforcement​
+​✔ Automated route planning​
+
+​✔ Flexible configuration per tenant​
+​✔ Reduced manual intervention​
+
+​Example Rule Engine Diagram​
+​Employee Data​
+|​​
+​v​
+​Shift Assignment​
+|​​
+​v​
+​Rules Engine​
+|​​
+​v​
+​Route Optimization​
+|​​
+​v​
+​Trip Generation​
+
+​Additional Update (Recommended for​
+​Client)​
+​Also mention in documentation:​
+
+​Enterprise Transport Intelligence​
+​The platform includes analytics for:​
+
+​●​
+​●​
+​●​
+​●​
+​●​
+
+​Vehicle utilization​
+​Route efficiency​
+​Cost per employee​
+​Fleet optimization​
+​Driver performance​
+
+​Update for Role Permission Matrix​
+​The permission matrix image you attached represents​​Role Based Access Control​
+​(RBAC)​.​
+​You should add a section:​
+
+​Role-Based Access Control​
+​Roles:​
+​Super Admin​
+​Tenant Admin​
+​HR​
+​Transport Manager​
+​Ground Staff​
+​Finance​
+​Driver​
+​Employee​
+
+​Permissions are controlled using​​RBAC policies stored​​in database​.​
+
+​Final Result​
+​After adding this section, your documentation will include:​
+​1️⃣ Architecture​
+​2️⃣ Tech stack​
+
+​3️⃣ Workflow​
+​4️⃣ Rules engine​
+​5️⃣ RBAC system​
+​6️⃣ Scalability design​
+​7️⃣ Analytics​
+
+​1. Multi-Tenant Architecture Confirmation​
+​The platform is designed using a​​multi-tenant SaaS​​architecture​, allowing multiple​
+​organizations to operate independently within the same system.​
+​Each organization is treated as a​​separate tenant​,​​and all tenant-specific data is associated​
+​with a unique​​
+tenant_id​
+.​
+​Tenant data isolation is implemented through:​
+​●​ ​tenant-aware middleware​
+​●​ ​tenant-scoped database queries​
+​●​ ​role-based access controls​
+​This ensures that users can only access data belonging to their own organization while​
+​maintaining a shared infrastructure environment.​
+
+​2. CI/CD and DevOps Workflow​
+​The development lifecycle follows a​​Continuous Integration​​and Continuous Deployment​
+​(CI/CD) pipeline​​to ensure stable and reliable software​​releases.​
+
+​Development Workflow​
+​Developer Commit​
+​↓​
+​Code Pushed to Git Repository​
+​↓​
+​Automated CI Pipeline Triggered​
+​↓​
+
+​Code Validation and Testing​
+​↓​
+​Build Artifacts Generated​
+​↓​
+​Deployment Pipeline Executed​
+
+​Automated checks include:​
+​●​
+​●​
+​●​
+​●​
+
+​code linting​
+​unit testing​
+​dependency validation​
+​build verification​
+
+​This workflow ensures consistent code quality and rapid deployment of new features.​
+
+​3. Git Repository Ownership​
+​All project source code will be maintained in a centralized​​Git-based version control​
+​system​.​
+​The repository will be created under the​​client’s​​organization account​​from the start of the​
+​project to ensure full ownership of the product.​
+​Supported platforms include:​
+​●​ ​GitHub​
+​●​ ​GitLab​
+​●​ ​Bitbucket​
+​A structured branching strategy will be followed:​
+​main → production releases​
+​develop → integration branch​
+​feature branches → new development​
+​hotfix branches → urgent fixes​
+
+​This ensures controlled development workflows and transparent version tracking.​
+
+​Additional Client Clarifications & System​
+​Design Updates​
+​This section includes additional technical clarifications requested by the client to ensure the​
+​platform supports​​enterprise-scale SaaS transport​​operations with strong security,​
+​automation, and operational flexibility​.​
+​The sections below extend the existing architecture documentation without repeating​
+​previously described system components.​
+
+​1. Enhanced Multi-Tenant Security​
+​Architecture​
+​The platform already supports multi-tenant SaaS architecture using tenant-based logical​
+i​solation.​
+​To further strengthen security and ensure strict separation between organizations, additional​
+​security mechanisms are implemented.​
+
+​Middleware-Based Tenant Resolution​
+​Tenant identification is handled through a dedicated middleware layer.​
+
+​Tenant Resolution Flow​
+​User Login​
+​↓​
+​Tenant Resolution Middleware​
+​↓​
+​Tenant Context Applied​
+
+​↓​
+​Database Queries Filtered by tenant_id​
+​↓​
+​Tenant-Specific Data Returned​
+
+​The middleware automatically identifies the organization (tenant) associated with each​
+​request and applies the appropriate tenant context to all backend operations.​
+​This ensures that:​
+​●​ ​all API queries are automatically scoped to the correct tenant​
+​●​ ​cross-tenant data access is prevented​
+​●​ ​tenant configurations remain isolated​
+
+​PostgreSQL Row-Level Security (RLS)​
+​To provide​​database-level tenant protection​, PostgreSQL​​Row-Level Security (RLS) can​
+​be enabled.​
+​RLS ensures that database queries only return rows belonging to the authenticated tenant.​
+​Example policy:​
+​CREATE POLICY tenant_isolation​
+​ON employees​
+​USING (tenant_id = current_setting('app.current_tenant')::int);​
+
+​Benefits:​
+​●​ ​prevents cross-tenant data leakage​
+​●​ ​enforces security at the database layer​
+​●​ ​provides defense-in-depth protection​
+
+​2. Advanced Route Optimization Engine​
+
+​The transport platform includes an advanced route planning system designed to generate​
+​efficient employee transport routes.​
+
+​Optimization Engine​
+​The system uses the​​Google OR-Tools Vehicle Routing​​Problem (VRP) solver​​for route​
+​optimization.​
+​OR-Tools enables advanced optimization with multiple operational constraints.​
+
+​Optimization Constraints​
+​The trip generation engine evaluates several operational parameters:​
+
+​Parameter​
+
+​Description​
+
+​Vehicle Capacity​
+
+​Maximum passengers per vehicle​
+
+​Pickup Time Window​
+
+​Allowed pickup range before shift​
+
+​Shift Timing​
+
+​Employee shift start time​
+
+​Driver Availability​
+
+​Driver work schedule​
+
+​Female Safety Rule​
+
+​Female employee cannot be last​
+​drop​
+
+​Maximum Route Duration​
+
+​Limit total travel time​
+
+​Vehicle Utilization​
+
+​Minimum occupancy threshold​
+
+​These constraints ensure that generated routes comply with operational policies and safety​
+​requirements.​
+
+​Constraint-Based Routing Strategy​
+​The system does​​not rely solely on Google Maps shortest​​path routing​.​
+​Instead, the routing process follows:​
+​Constraint-Based Optimization​
+
+​Mapping services such as Google Maps or Mapbox are used for:​
+​●​ ​travel distance calculations​
+​●​ ​ETA estimation​
+​●​ ​driver navigation​
+​The final route sequence is generated by the VRP optimization engine.​
+
+​3. Automated On-Call Transport Booking​
+​The system supports automated processing of ad-hoc transport requests received from​
+​clients.​
+​Transport managers can upload transport booking sheets directly into the platform.​
+
+​Excel / CSV Import​
+​Supported formats:​
+​●​ ​Excel (.xlsx)​
+​●​ ​CSV (.csv)​
+​Typical booking sheet columns include:​
+​Employee Name​
+​Employee ID​
+​Pickup Location​
+​Shift Time​
+
+​Route Number​
+​Department​
+
+​Automated Booking Processing​
+​After upload, the system performs automated processing.​
+​Import Booking Data​
+​↓​
+​Validate Employee Records​
+​↓​
+​Match Pickup Locations​
+​↓​
+​Group Employees​
+​↓​
+​Generate Trips Automatically​
+
+​This removes the need for manual trip planning.​
+
+​Employee Grouping Logic​
+​Employees can be grouped using multiple criteria.​
+
+​Grouping Method​
+
+​Route Number​
+
+​Description​
+
+​Predefined company route​
+
+​Pickup Location​
+
+​GPS-based clustering​
+
+​Department​
+
+​Optional grouping rule​
+
+​Shift Timing​
+
+​Mandatory grouping​
+​parameter​
+
+​This allows efficient trip generation while maintaining operational flexibility.​
+
+​4. Advanced Transport Rules​
+​Configuration​
+​The platform includes a configurable rules engine that allows organizations to define​
+​operational transport policies.​
+​Each organization can configure its own rules independently.​
+
+​Configurable Rule Types​
+​Rule​
+
+​Description​
+
+​Pickup Time Window​
+
+​Example: 20–40 minutes before shift​
+
+​Female Safety Policy​
+
+​Female employee cannot be last​
+​drop​
+
+​Maximum Route Duration​
+
+​Limit total travel time​
+
+​Vehicle Capacity Limits​
+
+​Minimum and maximum passengers​
+
+​Driver Shift Duration​
+
+​Maximum driver working hours​
+
+​Maximum Pickup Distance​ ​Allowed deviation from route​
+
+​Rule Storage Model​
+​Rules are stored per organization in the database.​
+​Example structure:​
+​transport_rules​
+​---------------​
+i​d​
+​organization_id​
+​rule_type​
+​rule_value​
+
+​Example configuration:​
+​organization_id = 201​
+​pickup_window = 30 minutes​
+​max_route_duration = 60 minutes​
+​female_last_drop_allowed = false​
+
+​This design allows flexible policy management across different companies.​
+
+​5. Real-Time Tracking Architecture​
+​(Enhanced)​
+​The platform supports real-time GPS monitoring of transport vehicles.​
+
+​GPS Update Frequency​
+​Driver mobile applications send location updates approximately every:​
+​5 seconds​
+
+​This provides near real-time trip visibility.​
+
+​Real-Time Streaming Architecture​
+​Driver Mobile App​
+​↓​
+​GPS Location API​
+​↓​
+​WebSocket Server​
+​↓​
+​Redis Pub/Sub​
+​↓​
+​Admin Dashboard Map​
+​Employee Mobile App​
+
+​Redis Pub/Sub ensures efficient distribution of live tracking updates across multiple​
+​dashboards and users.​
+
+​Tracking Capacity​
+​Typical deployment supports:​
+
+​Parameter​
+
+​Capacity​
+
+​Vehicles per​
+​organization​
+
+​100–500​
+
+​Concurrent GPS​
+​updates​
+
+​Thousands​
+
+​Dashboard users​
+
+​Multiple administrators​
+
+​The system can scale horizontally for larger deployments.​
+
+​6. Asynchronous Background Job​
+​Processing​
+​Several heavy system operations are executed using asynchronous background processing.​
+
+​Technology Stack​
+​Celery Workers​
+​Redis Queue​
+
+​Background Tasks​
+​Examples of asynchronous tasks:​
+
+​●​
+​●​
+​●​
+​●​
+​●​
+
+​trip generation​
+​bulk employee imports​
+​analytics calculations​
+​notification delivery​
+​report generation​
+
+​Task Processing Flow​
+​User Request​
+​↓​
+​API Receives Request​
+​↓​
+​Task Added to Redis Queue​
+​↓​
+​Celery Worker Processes Task​
+​↓​
+​Results Stored in Database​
+​↓​
+​User Notification Sent​
+
+​This architecture keeps the API responsive even during large processing workloads.​
+
+​7. Enterprise Scalability Expectations​
+​The platform architecture supports large enterprise transport deployments.​
+
+​Typical Deployment Capacity​
+
+​Component​
+
+​Supported​
+​Scale​
+
+​Organizations (tenants)​
+
+​Hundreds​
+
+​Employees per organization​
+
+​5,000+​
+
+​Vehicles tracked​
+​simultaneously​
+
+​500+​
+
+​Active trips​
+
+​Thousands​
+
+​Large Dataset Trip Generation​
+​Example scenario:​
+​Employees: 1000​
+​Vehicles: 150​
+​Multiple operational constraints​
+
+​Trip generation typically completes within:​
+​10–30 seconds​
+
+​depending on route complexity.​
+
+​8. Transport Analytics & Fleet​
+​Optimization​
+
+​The platform provides advanced analytics dashboards to help organizations monitor and​
+​optimize transport operations.​
+
+​Key Analytics Metrics​
+​Metric​
+
+​Description​
+
+​Vehicle Utilization​
+
+​Passenger occupancy rates​
+
+​Route Efficiency​
+
+​Travel time optimization​
+
+​Transport Cost per​
+​Employee​
+
+​Financial cost analysis​
+
+​Fleet Optimization​
+
+​Route performance insights​
+
+​Driver Performance​
+
+​Punctuality and safety​
+​metrics​
+
+​These insights help organizations reduce operational costs and improve service efficiency.​
+
+​9. Role-Based Access Control (RBAC)​
+​The platform implements a comprehensive Role-Based Access Control system to manage​
+​permissions across different operational roles.​
+​The following roles are supported:​
+​●​
+​●​
+​●​
+​●​
+​●​
+​●​
+
+​Super Admin​
+​Tenant Admin​
+​HR​
+​Transport Manager​
+​Ground Staff​
+​Finance​
+
+​●​ ​Driver​
+​●​ ​Employee​
+
+​Role Permission Matrix​
+​Module /​
+​Action​
+
+​Super​ ​Tenant​ ​H​
+​Admin​ ​Admin​ ​R​
+
+​Transpor​
+​t​
+​Manager​
+
+​Groun​
+​d Staff​
+
+​Finan​
+​ce​
+
+​Driver​
+
+​Employe​
+​e​
+
+​Create​
+​✔​
+​Organization​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Suspend​
+​✔​
+​Organization​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​View All​
+​Tenants​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Manage​
+​Subscription​
+​Plan​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Manage​
+​✖​
+​Organization​
+​Settings​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Create​
+​✖​
+​Admin Users​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✔​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Upload​
+​Employee​
+​Excel​
+
+​Edit​
+​Employee​
+​Details​
+
+​✖​
+
+​✔​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Manage​
+​Shift Rules​
+
+​✖​
+
+​✔​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Configure​
+​Route​
+​Master​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Add / Edit​
+​Vehicles​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Add / Edit​
+​Drivers​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Generate​
+​Trips (Auto)​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✔​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​Manual Trip​
+​Creation​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✔​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​View Live​
+​Tracking​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✔​
+
+​✔​
+
+​✖​
+
+​Driver​
+​Own​
+​Trip​
+
+​Employee​
+​Own Trip​
+
+​Mark Trip​
+​Completed​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✔​
+
+​✔​
+
+​Raise SOS​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✔​
+
+​✔​
+
+​View Billing​
+​Reports​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​Generate​
+​Invoice​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​Export​
+​Reports​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✔​
+
+​✖​
+
+​✖​
+
+​Access Audit​ ​✔​
+​Logs​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​✖​
+
+​1. Super Admin Panel – Subscription Tier​
+​Management​
+​The platform is designed as a​​multi-tenant SaaS system​,​​allowing multiple organizations to​
+​operate independently within the same application while maintaining strict data isolation.​
+​The​​Super Admin Panel​​acts as the platform owner interface​​and provides centralized​
+​control over companies, subscription plans, system analytics, and operational monitoring.​
+
+​Core Super Admin Functions​
+​The Super Admin will have the following capabilities:​
+​• Create and manage company accounts​
+​• Manage subscription plans​
+​• Monitor system usage across organizations​
+​• Access platform analytics and system logs​
+​• Control feature availability across subscription tiers​
+
+​Configurable Subscription Tiers​
+​The system supports configurable subscription tiers that allow the platform owner to offer​
+​different levels of functionality.​
+​Example subscription tiers:​
+​• Free​
+​• Basic​
+​• Premium​
+​• Enterprise​
+​Each tier can define:​
+​• Feature access permissions​
+​• Organization limits​
+​• Module availability​
+​• API usage limits​
+
+​Feature Access Based on Subscription Plan​
+​The Super Admin can configure which features are available in each subscription tier.​
+​Example:​
+
+​Feature​
+
+​Free​ ​Basi​ ​Premium​ ​Enterprise​
+​c​
+
+​Employee​
+​Management​
+
+​✓​
+
+​✓​
+
+​✓​
+
+​✓​
+
+​Live Tracking​
+
+​✓​
+
+​✓​
+
+​✓​
+
+​✓​
+
+​Route Optimization​
+
+​✗​
+
+​✓​
+
+​✓​
+
+​✓​
+
+​Advanced Analytics​
+
+​✗​
+
+​✗​
+
+​✓​
+
+​✓​
+
+​Vendor Marketplace​
+
+​✗​
+
+​✗​
+
+​✓​
+
+​✓​
+
+​This allows the platform owner to restrict advanced capabilities to higher subscription plans.​
+
+​Organization-Level Limits​
+​Each subscription plan can define limits for organizations using the system.​
+​Example configuration:​
+
+​Plan​
+
+​Employee​
+​s​
+
+​Vehicle​ ​Trips per Day​
+​s​
+
+​Free​
+
+​100​
+
+​10​
+
+​20​
+
+​Basic​
+
+​500​
+
+​50​
+
+​100​
+
+​Premium​
+
+​2000​
+
+​200​
+
+​Unlimited​
+
+​Custom​
+
+​Custom​
+
+​Enterprise​ ​Custom​
+
+​These limits are enforced automatically by the backend services.​
+
+​2. Reporting & Analytics Enhancements​
+​The system already generates the following reports at the end of each month:​
+​• Total trips​
+​• Total distance traveled​
+​• Driver performance​
+​• Delay reports​
+​• Cost per employee​
+
+​To further enhance analytics capabilities, the following additional reports will be included.​
+
+​Fleet Utilization Report​
+​This report evaluates how efficiently vehicles are used across the transport network.​
+​Metrics included:​
+​• Number of trips per vehicle​
+​• Average occupancy rate​
+​• Idle vehicle percentage​
+​• Total vehicle operating hours​
+​Example:​
+
+​Vehicle ID​ ​Trips Completed​ ​Utilization​
+
+​V101​
+
+​32​
+
+​85%​
+
+​V102​
+
+​18​
+
+​60%​
+
+​This helps identify underutilized vehicles and optimize fleet usage.​
+
+​Route Efficiency Report​
+​This report analyzes route performance and helps improve route planning.​
+​Metrics include:​
+​• Total route distance​
+​• Average trip duration​
+​• Traffic delays​
+​• Route deviation from optimal path​
+​This report allows transport managers to identify inefficient routes and optimize travel time.​
+
+​Route Consolidation Suggestions​
+​The system includes an analytics engine that identifies opportunities to combine routes with​
+l​ow passenger occupancy.​
+​Example:​
+​Route A – 3 employees​
+​Route B – 2 employees​
+​System suggestion:​
+​Merge routes to improve vehicle utilization and reduce operational cost.​
+
+​3. Vendor Fleet Management (Multiple​
+​Transport Providers)​
+​The system supports​​multiple transport providers (vendors)​.​
+​This is useful for organizations that outsource transportation to several fleet operators.​
+
+​Vendor Management Features​
+​The system will support:​
+​• Vendor registration​
+​• Vendor fleet management​
+​• Vendor driver management​
+​• Vendor contract tracking​
+​• Vendor performance analytics​
+​Each vendor can manage their own:​
+​• Drivers​
+​• Vehicles​
+​• Assigned trips​
+​This allows companies to manage transportation from multiple fleet vendors within a single​
+​platform.​
+
+​4. Manual Trip Creation with Multiple​
+​Stops​
+​Yes, the system supports​​manual trip creation​.​
+​Transport managers can manually create trips when required.​
+​Features include:​
+​• Assign vehicle​
+​• Assign driver​
+​• Add multiple pickup stops​
+​• Add multiple drop locations​
+​• Assign shift timing​
+​Example trip route:​
+​Stop 1 – Employee A​
+​Stop 2 – Employee B​
+​Stop 3 – Employee C​
+​The system will automatically calculate:​
+​• total route distance​
+​• estimated travel time​
+​• optimized stop sequence​
+
+​5. Bulk Upload & Bulk Download​
+​The system supports bulk data management to simplify large-scale operations.​
+​Supported entities include:​
+​• Employees​
+​• Drivers​
+​• Vehicles​
+​• Routes​
+​• Shift schedules​
+​Supported formats:​
+​• Excel (.xlsx)​
+​• CSV (.csv)​
+
+​Bulk Upload Workflow​
+​1 Upload file​
+​2 Validate records​
+​3 Display error report (if any)​
+​4 Import valid records​
+​5 Generate summary report​
+​The system will also allow​​bulk data export​​for reporting​​or external processing.​
+
+​6. System Health Monitoring Dashboard​
+​The platform includes a​​system health monitoring dashboard​​for administrators.​
+​The dashboard will display:​
+​• API response times​
+​• Database performance metrics​
+​• Server CPU and memory usage​
+​• Active users and vehicles​
+​• Background job status​
+​Alerts will be triggered when:​
+​• server load exceeds thresholds​
+​• database latency increases​
+​• service failures occur​
+​This helps maintain platform reliability and operational visibility.​
+
+​7. Edit and Delete Options for Forms​
+​All system modules support full​​CRUD operations (Create,​​Read, Update, Delete).​
+​Administrative users can:​
+​• Create records​
+​• Edit records​
+​• Delete records​
+​• Perform bulk deletion​
+​Modules supporting CRUD operations include:​
+
+​• Employees​
+​• Drivers​
+​• Vehicles​
+​• Routes​
+​• Trips​
+​• Vendors​
+​Both​​single record operations​​and​​bulk operations​​will be available.​
+
+​8. Database Backup and Data Recovery​
+​The platform includes an automated​​database backup​​and recovery system​​to ensure​
+​data safety.​
+
+​Backup Types​
+​The system supports:​
+​• Full database backup​
+​• Organization-level backup​
+​• Vendor-level backup​
+
+​Backup Schedule​
+​Example backup policy:​
+​• Daily automated backup​
+​• Weekly full snapshot​
+​• Monthly archive backup​
+​Backups will be stored in secure cloud storage such as:​
+​• AWS S3​
+
+​Data Restoration​
+​The system will allow administrators to restore:​
+​• full database​
+​• specific organization data​
+​• vendor-level data​
+​Backup retention periods can be configured depending on organizational policies.​
+
+
