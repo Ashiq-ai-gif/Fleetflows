@@ -5,8 +5,10 @@
 #   VPS_SSH_KEY      - Your private SSH key (no passphrase)
 #   VPS_HOST         - Your VPS IP (e.g., 82.29.161.186)
 #   VPS_USER         - Your VPS username (e.g., root)
-#   APP_PATH         - Path to your app on the VPS (e.g., /root/Fleetflows)
-#   (Optional) EXPO_TOKEN - For Expo publishing if needed
+# Optional GitHub Secrets:
+#   APP_PATH         - Path to your app on the VPS (defaults to /root/Fleetflows)
+#   APP_SERVICE      - systemd service name (defaults to fleetflows, falls back to nohup if missing)
+#   EXPO_TOKEN       - For Expo publishing if needed
 
 name: CI/CD Deploy to VPS
 
@@ -62,12 +64,37 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
-            cd ${{ secrets.APP_PATH }}
-            git pull origin $(git rev-parse --abbrev-ref HEAD)
+            BRANCH="${{ github.ref_name }}"
+            APP_PATH="${{ secrets.APP_PATH }}"
+            SERVICE_NAME="${{ secrets.APP_SERVICE }}"
+
+            if [ -z "$APP_PATH" ]; then
+              APP_PATH="/root/Fleetflows"
+            fi
+
+            if [ -z "$SERVICE_NAME" ]; then
+              SERVICE_NAME="fleetflows"
+            fi
+
+            cd "$APP_PATH"
+
+            if [ ! -d ".git" ]; then
+              echo "APP_PATH must point to the git project folder. Missing .git in $APP_PATH"
+              exit 1
+            fi
+
+            git fetch origin "$BRANCH"
+            git switch "$BRANCH" || git switch -c "$BRANCH" --track "origin/$BRANCH"
+            git pull --ff-only origin "$BRANCH"
             npm ci
-            npm run build
             npx prisma migrate deploy
-            systemctl restart fleet-flows
+            npm run build
+            if sudo systemctl list-unit-files | grep -q "^${SERVICE_NAME}\.service"; then
+              sudo systemctl restart "$SERVICE_NAME"
+            else
+              pkill -f "next start -p 3000" || true
+              nohup npm run start -- -p 3000 > app.log 2>&1 < /dev/null &
+            fi
 
       - name: Success Notification
         if: success()

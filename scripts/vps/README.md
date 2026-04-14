@@ -2,6 +2,8 @@
 
 These files are **templates**. Copy them to the server and edit hostnames/paths before use.
 
+Use a non-root app path such as `/var/www/fleet-flows/current` or `/home/<deploy-user>/Fleetflows` when the service runs as `www-data`. A checkout inside `/root/Fleetflows` is fine for first-time manual testing, but it is not a good default for `systemd`.
+
 | File | Purpose |
 |------|---------|
 | [nginx-fleet-flows.conf](nginx-fleet-flows.conf) | Nginx reverse proxy to `127.0.0.1:3000` + ACME webroot / Certbot-friendly server block. |

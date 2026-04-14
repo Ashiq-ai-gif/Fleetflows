@@ -19,14 +19,17 @@ sudo apt update && sudo apt install -y nginx postgresql postgresql-contrib certb
 ## 3. PostgreSQL
 
 ```bash
-sudo -u postgres psql -c "CREATE USER fleet WITH PASSWORD 'change-me-strong';"
-sudo -u postgres psql -c "CREATE DATABASE fleet OWNER fleet;"
+sudo -u postgres psql
+CREATE USER fleetflows_user WITH PASSWORD 'strongpassword';
+CREATE DATABASE fleetflows_db OWNER fleetflows_user;
+GRANT ALL PRIVILEGES ON DATABASE fleetflows_db TO fleetflows_user;
+\q
 ```
 
 Set `DATABASE_URL` (use SSL if you enable `hostssl` in `pg_hba.conf`; for localhost-only, typical dev/prod on one box):
 
 ```env
-DATABASE_URL="postgresql://fleet:change-me-strong@127.0.0.1:5432/fleet?schema=public"
+DATABASE_URL="postgresql://fleetflows_user:strongpassword@127.0.0.1:5432/fleetflows_db?schema=public"
 ```
 
 Ensure PostgreSQL listens only on localhost unless you have a separate DB tier.
@@ -62,6 +65,8 @@ sudo npm run build
 ```
 
 Place environment variables in `/var/www/fleet-flows/current/.env.production` (permissions `600`, owned by deploy user). Required variables are listed in [docs/PRD.md](docs/PRD.md#9-environments-and-configuration).
+
+If you are testing manually and already cloned the repo to `/root/Fleetflows`, Git commands will work there, but the provided `systemd` template assumes a non-root app path such as `/var/www/fleet-flows/current`. Keeping the app under `/root` is not recommended when the service runs as `www-data`.
 
 Start the app on loopback:
 
