@@ -29,29 +29,26 @@ jobs:
         with:
           node-version: 20
 
+
       - name: Install dependencies (Web)
         run: |
-          cd Fleetflows
           npm ci
 
       - name: Build Web App
         run: |
-          cd Fleetflows
           npm run build
 
       - name: Lint Web App
         run: |
-          cd Fleetflows
           npm run lint
 
       - name: Prisma Migrate (Web)
         run: |
-          cd Fleetflows
           npm run db:migrate
 
       - name: Install dependencies (Mobile)
         run: |
-          cd Fleetflows/mobile
+          cd mobile
           npm ci
 
       # Optional: Build Mobile App (Expo)
