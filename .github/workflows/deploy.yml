@@ -7,8 +7,8 @@
 #   VPS_USER         - Your VPS username (e.g., root)
 # Optional GitHub Secrets:
 #   VPS_SSH_PASSPHRASE - Passphrase for encrypted private key, if any
-#   APP_PATH         - Path to your live app on the VPS (defaults to /var/www/fleetflows)
-#   APP_SERVICE      - PM2 app name or systemd service name (defaults to fleetflows)
+#   APP_PATH         - Path to your app on the VPS (defaults to /root/Fleetflows)
+#   APP_SERVICE      - systemd service name (defaults to fleetflows, falls back to nohup if missing)
 #   EXPO_TOKEN       - For Expo publishing if needed
 
 name: CI/CD Deploy to VPS
@@ -71,7 +71,7 @@ jobs:
             SERVICE_NAME="${{ secrets.APP_SERVICE }}"
 
             if [ -z "$APP_PATH" ]; then
-              APP_PATH="/var/www/fleetflows"
+              APP_PATH="/root/Fleetflows"
             fi
 
             if [ -z "$SERVICE_NAME" ]; then
@@ -88,16 +88,10 @@ jobs:
             git fetch origin "$BRANCH"
             git switch "$BRANCH" || git switch -c "$BRANCH" --track "origin/$BRANCH"
             git pull --ff-only origin "$BRANCH"
-            if [ -f ".env.production" ]; then
-              cp .env.production .env
-            fi
             npm ci
             npx prisma migrate deploy
             npm run build
-            if command -v pm2 >/dev/null 2>&1 && pm2 describe "$SERVICE_NAME" >/dev/null 2>&1; then
-              pm2 restart "$SERVICE_NAME" --update-env
-              pm2 save
-            elif sudo systemctl list-unit-files | grep -q "^${SERVICE_NAME}\.service"; then
+            if sudo systemctl list-unit-files | grep -q "^${SERVICE_NAME}\.service"; then
               sudo systemctl restart "$SERVICE_NAME"
             else
               pkill -f "next start -p 3000" || true
