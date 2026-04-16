@@ -8,7 +8,7 @@
 # Optional GitHub Secrets:
 #   VPS_SSH_PASSPHRASE - Passphrase for encrypted private key, if any
 #   APP_PATH         - Path to your app on the VPS (defaults to /root/Fleetflows)
-#   APP_SERVICE      - systemd service name (defaults to fleetflows, falls back to nohup if missing)
+#   APP_SERVICE      - systemd service name (defaults to fleet-flows, falls back to nohup if missing)
 #   EXPO_TOKEN       - For Expo publishing if needed
 
 name: CI/CD Deploy to VPS
@@ -75,7 +75,7 @@ jobs:
             fi
 
             if [ -z "$SERVICE_NAME" ]; then
-              SERVICE_NAME="fleetflows"
+              SERVICE_NAME="fleet-flows"
             fi
 
             cd "$APP_PATH"
