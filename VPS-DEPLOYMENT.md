@@ -1,4 +1,4 @@
-# Fleet Flows — Hostinger VPS (all-in-one)
+# Fleet Flows - Hostinger VPS (all-in-one)
 
 This path runs **Next.js** and **PostgreSQL** on the same VPS, with **Nginx** terminating TLS. Vercel is not required.
 
@@ -8,7 +8,7 @@ This path runs **Next.js** and **PostgreSQL** on the same VPS, with **Nginx** te
 
 - Ubuntu 22.04 LTS or similar (Hostinger VPS template).
 - Non-root deploy user with `sudo`.
-- Domain `app.example.com` pointing to the VPS public IP (A record).
+- Domain `fleetflowz.com` pointing to the VPS public IP (A record), with `www.fleetflowz.com` pointing to the same host or aliased to the apex domain.
 
 ## 2. Install system packages
 
@@ -74,11 +74,11 @@ Start the app on loopback:
 cd /var/www/fleet-flows/current && NODE_ENV=production npm run start -- -p 3000
 ```
 
-Use **systemd** or **PM2** so the process restarts on reboot — see [scripts/vps/fleet-flows.service](scripts/vps/fleet-flows.service) and [scripts/vps/README.md](scripts/vps/README.md).
+Use **systemd** or **PM2** so the process restarts on reboot - see [scripts/vps/fleet-flows.service](scripts/vps/fleet-flows.service) and [scripts/vps/README.md](scripts/vps/README.md).
 
 ## 6. Nginx reverse proxy
 
-Copy and edit [scripts/vps/nginx-fleet-flows.conf](scripts/vps/nginx-fleet-flows.conf): replace `app.example.com` and SSL paths. Enable site:
+Copy [scripts/vps/nginx-fleet-flows.conf](scripts/vps/nginx-fleet-flows.conf) to `/etc/nginx/sites-available/fleet-flows`, then enable the site:
 
 ```bash
 sudo cp nginx-fleet-flows.conf /etc/nginx/sites-available/fleet-flows
@@ -86,16 +86,16 @@ sudo ln -sf /etc/nginx/sites-available/fleet-flows /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-## 7. TLS (Let’s Encrypt)
+## 7. TLS (Let's Encrypt)
 
 ```bash
-sudo certbot --nginx -d app.example.com
+sudo certbot --nginx -d fleetflowz.com -d www.fleetflowz.com
 ```
 
 After certificates exist, set:
 
 ```env
-AUTH_URL="https://app.example.com"
+AUTH_URL="https://fleetflowz.com"
 ```
 
 (or `NEXTAUTH_URL` with the same value).
@@ -121,4 +121,4 @@ Unset the variable afterward. Log in, **change the password** in-app or by re-se
 
 ## 10. Mobile builds
 
-Set `EXPO_PUBLIC_API_URL=https://app.example.com/api` in your EAS secrets or `.env` for Expo, then build. Never ship production mobile builds pointing at `http://` or raw IPs.
+Set `EXPO_PUBLIC_API_URL=https://fleetflowz.com/api` in your EAS secrets or `.env` for Expo, then build. Never ship production mobile builds pointing at `http://` or raw IPs.
