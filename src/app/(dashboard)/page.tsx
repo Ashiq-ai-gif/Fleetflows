@@ -12,9 +12,34 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 
 export default function Home() {
   const { data: session } = useSession();
+  const [drivers, setDrivers] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      try {
+        const res = await fetch('/api/drivers');
+        const data = await res.json();
+        setDrivers(data.drivers || []);
+      } catch (e) {}
+    };
+    if (session?.user) {
+      fetchDrivers();
+      const int = setInterval(fetchDrivers, 15000);
+      return () => clearInterval(int);
+    }
+  }, [session]);
+
+  const activeDrivers = drivers.filter((d: any) => d.latitude && d.longitude);
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
+  });
 
   return (
     <div className="p-8 space-y-8">
@@ -101,28 +126,53 @@ export default function Home() {
           </div>
           
           <div className="flex-1 bg-slate-950 relative overflow-hidden">
-            {/* Artistic Map-like Background */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none grayscale contrast-125">
-              <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/-122.4194,37.7749,12/800x600?access_token=pk.placeholder')] bg-cover"></div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-            
-            <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-              <div className="space-y-6 max-w-sm glassmorphism p-8 rounded-3xl border border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl">
-                <div className="p-5 rounded-3xl bg-blue-600/20 inline-block border border-blue-600/30">
-                  <MapPin className="w-12 h-12 text-blue-500 animate-bounce" />
-                </div>
-                <div className="space-y-2">
-                  <h4 className="text-xl font-bold text-white tracking-tight">Live Tracking Engine</h4>
-                  <p className="text-slate-400 text-sm leading-relaxed">The tracking module is ready. Please provide your **Google Maps API Key** to enable real-time vehicle movement on this map.</p>
-                </div>
-                <div className="pt-2">
-                  <button className="w-full py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all active:scale-95 shadow-xl shadow-blue-900/20">
-                    Setup Maps API
-                  </button>
-                </div>
+            {isLoaded ? (
+              <GoogleMap
+                mapContainerStyle={{ width: '100%', height: '100%' }}
+                zoom={activeDrivers.length > 0 ? 12 : 9}
+                center={activeDrivers.length > 0 ? { lat: activeDrivers[0].latitude, lng: activeDrivers[0].longitude } : { lat: 37.7749, lng: -122.4194 }}
+                options={{
+                  disableDefaultUI: true,
+                  styles: [
+                    { "elementType": "geometry", "stylers": [{ "color": "#1e293b" }] },
+                    { "elementType": "labels.text.fill", "stylers": [{ "color": "#8b9cb5" }] },
+                    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#f8fafc" }] },
+                    { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
+                    { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
+                    { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] },
+                    { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] },
+                    { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#334155" }] },
+                    { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] },
+                    { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] },
+                    { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#475569" }] },
+                    { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] },
+                    { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#cbd5e1" }] },
+                    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#0f172a" }] },
+                    { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] },
+                    { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }
+                  ]
+                }}
+              >
+                 {activeDrivers.map((d: any) => (
+                   <Marker 
+                     key={d.id} 
+                     position={{ lat: d.latitude, lng: d.longitude }} 
+                     title={`${d.name} (${d.status})`} 
+                     icon={{
+                       url: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%233b82f6' viewBox='0 0 24 24' stroke-width='1.5' stroke='white' class='w-6 h-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M15 10.5a3 3 0 11-6 0 3 3 0 016 0z' /%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z' /%3E%3C/svg%3E",
+                       scaledSize: new window.google.maps.Size(40, 40)
+                     }}
+                   />
+                 ))}
+              </GoogleMap>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                 <div className="animate-pulse flex flex-col items-center gap-4">
+                   <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                   <p className="text-slate-400 font-bold text-sm tracking-widest uppercase">Initializing Telemetry Engine...</p>
+                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
