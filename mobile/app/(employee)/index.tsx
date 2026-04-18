@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import MapView, { Marker } from 'react-native-maps';
 import { getMobileV1Base } from '../constants';
 
 export default function EmployeeDashboard() {
@@ -8,6 +9,7 @@ export default function EmployeeDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [trips, setTrips] = useState<any[]>([]);
   const [employee, setEmployee] = useState<any>(null);
+  const [driverLocation, setDriverLocation] = useState<any>(null);
 
   const fetchData = async () => {
     try {
@@ -78,6 +80,23 @@ export default function EmployeeDashboard() {
   const nextTrip = trips.length > 0 ? trips[0] : null;
   // Determine if employee already boarded the active trip
   const amIBoarded = nextTrip?.passengers?.find((p: any) => p.employeeId === employee?.id)?.status === "boarded";
+  const myPassengerRecord = nextTrip?.passengers?.find((p: any) => p.employeeId === employee?.id);
+
+  useEffect(() => {
+    let interval: any;
+    if (nextTrip?.driverId && nextTrip?.status === 'EN_ROUTE') {
+      interval = setInterval(async () => {
+        try {
+          const res = await fetch(`${getMobileV1Base().replace('/v1', '')}/driver/location?driverId=${nextTrip.driverId}`);
+          const data = await res.json();
+          if (data.success && data.location.latitude) {
+            setDriverLocation({ lat: data.location.latitude, lng: data.location.longitude });
+          }
+        } catch (e) {}
+      }, 5000);
+    }
+    return () => clearInterval(interval);
+  }, [nextTrip]);
 
   if (loading && !refreshing) {
     return (
@@ -113,15 +132,31 @@ export default function EmployeeDashboard() {
         <View style={styles.rideCard}>
           <View style={styles.cardHeader}>
             <View style={styles.badge}><Text style={styles.badgeText}>TRIP #{nextTrip.id.slice(-4).toUpperCase()}</Text></View>
-            <Text style={styles.timeText}>
-              {new Date(nextTrip.scheduledTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </Text>
+            <View style={{alignItems: 'flex-end'}}>
+               <Text style={{color: '#34d399', fontSize: 10, fontWeight: '800', uppercase: true}}>Precise ETA</Text>
+               <Text style={styles.timeText}>
+                 {myPassengerRecord?.estimatedPickupTime ? new Date(myPassengerRecord.estimatedPickupTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date(nextTrip.scheduledTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+               </Text>
+            </View>
           </View>
 
           {/* Live Map Stub */}
           <View style={styles.mapStub}>
-            <Text style={styles.mapText}>Live Driver Location Tracking</Text>
-            <View style={styles.driverPin} />
+            {driverLocation ? (
+              <MapView 
+                style={{ width: '100%', height: '100%' }}
+                region={{
+                  latitude: driverLocation.lat,
+                  longitude: driverLocation.lng,
+                  latitudeDelta: 0.0122,
+                  longitudeDelta: 0.0121,
+                }}
+              >
+                 <Marker coordinate={{ latitude: driverLocation.lat, longitude: driverLocation.lng }} pinColor="#3b82f6" />
+              </MapView>
+            ) : (
+              <Text style={styles.mapText}>{nextTrip.status === 'EN_ROUTE' ? 'Locating driver...' : 'Live tracking begins when trip starts'}</Text>
+            )}
           </View>
 
           <View style={styles.driverInfo}>

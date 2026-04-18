@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 export default function TenantBillingPage() {
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [currentLiability, setCurrentLiability] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,6 +16,7 @@ export default function TenantBillingPage() {
         if (res.ok) {
           const data = await res.json();
           setInvoices(data.invoices || []);
+          setCurrentLiability(data.currentUnbilledLiability || 0);
         }
       } catch (e) {
         console.error(e);
@@ -70,7 +72,7 @@ export default function TenantBillingPage() {
                      <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-500"><DollarSign className="w-6 h-6" /></div>
                      <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Estimated Cost</span>
                    </div>
-                   <h3 className="text-3xl font-black text-white leading-tight">₹1,24,500 <span className="text-xs text-slate-500 font-bold tracking-normal uppercase">Current Month</span></h3>
+                   <h3 className="text-3xl font-black text-white leading-tight">${currentLiability.toLocaleString(undefined, {minimumFractionDigits: 2})} <span className="text-xs text-slate-500 font-bold tracking-normal uppercase">Current Unbilled</span></h3>
                  </div>
                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-800/50">
                     <TrendingUp className="w-4 h-4 text-emerald-500" />

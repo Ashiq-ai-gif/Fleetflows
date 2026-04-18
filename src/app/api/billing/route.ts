@@ -16,10 +16,15 @@ export async function GET() {
       orderBy: { createdAt: 'desc' }
     });
 
-    // If no invoices exist (new account), we can mock array for demo or return empty.
-    // Given the launch is tomorrow, it is better to return empty and let admin generate them.
+    // Sum unbilled trips
+    const liabilities = await db.trip.aggregate({
+      where: { tenantId, status: "COMPLETED" },
+      _sum: { tenantBilling: true }
+    });
 
-    return NextResponse.json({ invoices });
+    const currentUnbilledLiability = liabilities._sum.tenantBilling || 0;
+
+    return NextResponse.json({ invoices, currentUnbilledLiability });
 
   } catch (error) {
     console.error("Billing API Error:", error);

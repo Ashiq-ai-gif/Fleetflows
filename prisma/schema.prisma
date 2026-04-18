@@ -14,6 +14,7 @@ model Tenant {
   domain      String?  @unique
   plan        PlanTier @default(BASIC)
   status      String   @default("active") // active, suspended
+  ratePerKm   Float    @default(0.0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -56,6 +57,21 @@ enum UserRole {
 }
 
 // Operational Elements
+model Vendor {
+  id           String   @id @default(uuid())
+  name         String
+  contactEmail String?
+  contactPhone String?
+  status       String   @default("active")
+  ratePerKm    Float    @default(0.0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  drivers      Driver[]
+  vehicles     Vehicle[]
+  trips        Trip[]
+}
+
 model Employee {
   id             String   @id @default(uuid())
   tenantId       String
@@ -82,9 +98,13 @@ model Driver {
   id            String   @id @default(uuid())
   tenantId      String
   tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vendorId      String?
+  vendor        Vendor?  @relation(fields: [vendorId], references: [id])
   name          String
   phone         String
   licenseNumber String   @unique
+  latitude      Float?
+  longitude     Float?
   /// Bcrypt hash of mobile/web PIN when set; otherwise legacy demo rules only if ALLOW_DEMO_DRIVER_EMPLOYEE_AUTH is enabled (non-prod or explicit).
   loginPinHash  String?
   rating        Float    @default(5.0)
@@ -95,12 +115,15 @@ model Driver {
   trips         Trip[]
 
   @@index([tenantId])
+  @@index([vendorId])
 }
 
 model Vehicle {
   id            String   @id @default(uuid())
   tenantId      String
   tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vendorId      String?
+  vendor        Vendor?  @relation(fields: [vendorId], references: [id])
   model         String
   plateNumber   String   @unique
   capacity      Int
@@ -112,12 +135,15 @@ model Vehicle {
   trips         Trip[]
 
   @@index([tenantId])
+  @@index([vendorId])
 }
 
 model Trip {
   id            String   @id @default(uuid())
   tenantId      String
   tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vendorId      String?
+  vendor        Vendor?  @relation(fields: [vendorId], references: [id])
   driverId      String
   driver        Driver   @relation(fields: [driverId], references: [id])
   vehicleId     String
@@ -128,10 +154,16 @@ model Trip {
   endTime       DateTime?
   startLocation String?
   endLocation   String?
+  routePolyline String?
+  overallDistance String?
+  distanceInKm    Float?
+  vendorCost      Float?
+  tenantBilling   Float?
   
   passengers    TripPassenger[]
 
   @@index([tenantId])
+  @@index([vendorId])
   @@index([driverId])
 }
 
@@ -142,6 +174,9 @@ model TripPassenger {
   employeeId    String
   employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   status        String   @default("pending") // pending, picked_up, dropped_off, missed
+  sequenceIndex Int?
+  estimatedPickupTime DateTime?
+  actualPickupTime    DateTime?
   
   @@unique([tripId, employeeId])
 }

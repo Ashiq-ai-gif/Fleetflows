@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { calculateTripRoute } from "@/lib/routing";
 
 export async function POST(req: Request) {
   try {
@@ -10,6 +11,9 @@ export async function POST(req: Request) {
     }
 
     const tenantId = session.user.tenantId;
+
+    const tenantRecord = await db.tenant.findUnique({ where: { id: tenantId }, select: { ratePerKm: true } });
+    const tenantRate = tenantRecord?.ratePerKm || 0;
 
     const { shift, date, strategy } = await req.json();
 
@@ -34,7 +38,8 @@ export async function POST(req: Request) {
     // 2. Fetch Available Vehicles & Drivers
     const vehicles = await db.vehicle.findMany({
       where: { tenantId, status: "active" },
-      orderBy: { capacity: 'desc' }
+      orderBy: { capacity: 'desc' },
+      include: { vendor: true }
     });
 
     const drivers = await db.driver.findMany({
@@ -69,6 +74,49 @@ export async function POST(req: Request) {
       const passengersForTrip = employees.slice(employeeIndex, employeeIndex + vehicle.capacity);
       
       if (passengersForTrip.length > 0) {
+        let routePolyline = "";
+        let distanceInKm: number | null = null;
+        let vendorCost: number | null = null;
+        let tenantBilling: number | null = null;
+
+        let orderedPassengers: any[] = passengersForTrip.map((emp: any, index: number) => ({
+          employeeId: emp.id,
+          status: "pending",
+          sequenceIndex: index + 1,
+          estimatedPickupTime: scheduledDateTime
+        }));
+
+        try {
+          // Fallback coordinate: Assuming the OfficeHQ is roughly 0,0 locally if absent.
+          // Real system enforces coordinate presence on Employee onboarding
+          const waypoints = passengersForTrip.map((emp: any) => ({ lat: emp.latitude || 0, lng: emp.longitude || 0 }));
+          const hasCoords = waypoints.every((wp: any) => wp.lat !== 0 && wp.lng !== 0);
+
+          if (hasCoords) {
+             const routeData = await calculateTripRoute("Office HQ", `Zone ${resourceIndex + 1}`, waypoints, scheduledDateTime);
+             routePolyline = routeData.polyline || "";
+             distanceInKm = routeData.distanceInKm || null;
+             
+             if (distanceInKm) {
+                // @ts-ignore
+                vendorCost = parseFloat((distanceInKm * (vehicle.vendor?.ratePerKm || 0)).toFixed(2));
+                tenantBilling = parseFloat((distanceInKm * tenantRate).toFixed(2));
+             }
+             
+             orderedPassengers = passengersForTrip.map((emp: any, index: number) => {
+               const seq = routeData.waypointOrder.indexOf(index) + 1;
+               return {
+                 employeeId: emp.id,
+                 status: "pending",
+                 sequenceIndex: seq,
+                 estimatedPickupTime: routeData.estimatedTimes[index] || scheduledDateTime
+               };
+             });
+          }
+        } catch (error) {
+          console.error("Routing engine optimization omitted due to error", error);
+        }
+
         // Create the Trip
         const newTrip = await db.trip.create({
           data: {
@@ -79,11 +127,12 @@ export async function POST(req: Request) {
             status: "SCHEDULED",
             startLocation: "Office HQ",
             endLocation: `Zone ${resourceIndex + 1}`, // Mocking route zone
+            routePolyline: routePolyline !== "" ? routePolyline : null,
+            distanceInKm,
+            vendorCost,
+            tenantBilling,
             passengers: {
-              create: passengersForTrip.map(emp => ({
-                employeeId: emp.id,
-                status: "pending"
-              }))
+              create: orderedPassengers
             }
           },
           include: {

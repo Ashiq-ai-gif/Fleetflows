@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import * as Location from 'expo-location';
+import * as Linking from 'expo-linking';
 import { getMobileV1Base } from '../constants';
 
 export default function DriverDashboard() {
@@ -44,6 +46,45 @@ export default function DriverDashboard() {
     fetchData();
   }, []);
 
+  const activeTrip = trips.find(t => t.status === 'EN_ROUTE');
+  const nextScheduledTrip = trips.find(t => t.status === 'SCHEDULED');
+  const nextTrip = activeTrip || nextScheduledTrip;
+  
+  const sortedPassengers = nextTrip?.passengers?.sort((a: any, b: any) => (a.sequenceIndex || 0) - (b.sequenceIndex || 0)) || [];
+  const nextPassenger = sortedPassengers.find((p: any) => p.status === 'pending');
+
+  useEffect(() => {
+    let locationSubscription: any = null;
+
+    (async () => {
+      if (activeTrip && isOnline) {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') return;
+
+        locationSubscription = await Location.watchPositionAsync(
+          { accuracy: Location.Accuracy.High, distanceInterval: 10, timeInterval: 15000 },
+          async (location) => {
+            if (driver?.id) {
+               fetch(`${getMobileV1Base().replace('/v1', '')}/driver/location`, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ 
+                   driverId: driver.id, 
+                   latitude: location.coords.latitude, 
+                   longitude: location.coords.longitude 
+                 })
+               }).catch(e => console.log('Silently ignoring location push error'));
+            }
+          }
+        );
+      }
+    })();
+
+    return () => {
+      if (locationSubscription) locationSubscription.remove();
+    };
+  }, [trips, isOnline, driver]);
+
   const onRefresh = () => {
     setRefreshing(true);
     fetchData();
@@ -76,7 +117,6 @@ export default function DriverDashboard() {
     }
   };
 
-  const nextTrip = trips.find(t => t.status === 'SCHEDULED' || t.status === 'EN_ROUTE');
   const todaysCount = trips.length;
 
   if (loading) {
@@ -132,14 +172,29 @@ export default function DriverDashboard() {
                 <View style={styles.dotRed} />
               </View>
               <View style={styles.routeDetails}>
-                <View style={styles.locationBlock}>
-                  <Text style={styles.locationTitle}>{nextTrip.startLocation || 'Pickup Point'}</Text>
-                  <Text style={styles.locationSub}>Pickup • {nextTrip.passengers?.length || 0} Employees</Text>
-                </View>
-                <View style={styles.locationBlock}>
-                  <Text style={styles.locationTitle}>{nextTrip.endLocation || 'Drop-off Point'}</Text>
-                  <Text style={styles.locationSub}>Drop-off</Text>
-                </View>
+                {nextPassenger ? (
+                  <View style={styles.locationBlock}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                      <View>
+                        <Text style={styles.locationTitle}>{nextPassenger.employee?.name || 'Passenger'}</Text>
+                        <Text style={[styles.locationSub, {color: '#10b981', fontWeight: '800'}]}>
+                          ETA: {nextPassenger.estimatedPickupTime ? new Date(nextPassenger.estimatedPickupTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'}) : 'Pending'}
+                        </Text>
+                      </View>
+                      <TouchableOpacity 
+                        style={{backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, justifyContent: 'center'}}
+                        onPress={() => Linking.openURL(`google.navigation:q=${nextPassenger.employee?.latitude},${nextPassenger.employee?.longitude}`)}
+                      >
+                         <Text style={{color: '#fff', fontWeight: '800'}}>NAVIGATE</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={styles.locationBlock}>
+                    <Text style={styles.locationTitle}>{nextTrip.endLocation || 'Drop-off Point'}</Text>
+                    <Text style={styles.locationSub}>Head to Final Destination</Text>
+                  </View>
+                )}
               </View>
             </View>
 
