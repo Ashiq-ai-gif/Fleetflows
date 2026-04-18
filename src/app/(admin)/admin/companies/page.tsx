@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   Search, Plus, Building2, Edit, Trash2, LogIn, Ban,
-  X, Eye, EyeOff, CheckCircle, Loader2
+  X, Eye, EyeOff, CheckCircle, Loader2, ShieldCheck
 } from "lucide-react";
 
 type Company = {
@@ -192,12 +194,15 @@ function AddCompanyModal({ onClose, onSuccess }: { onClose: () => void; onSucces
   );
 }
 export default function CompaniesPage() {
+  const { update: updateSession } = useSession();
+  const router = useRouter();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedPlan, setSelectedPlan] = useState("All");
   const [showModal, setShowModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [impersonating, setImpersonating] = useState<string | null>(null);
 
   const fetchCompanies = async () => {
     setLoading(true);
@@ -231,8 +236,8 @@ export default function CompaniesPage() {
     suspended: companies.filter(c => c.status === "suspended").length,
   };
 
-  const handleImpersonate = async (companyId: string) => {
-    setLoading(true);
+  const handleImpersonate = async (companyId: string, companyName: string) => {
+    setImpersonating(companyId);
     try {
       const res = await fetch("/api/admin/impersonate", {
         method: "POST",
@@ -241,16 +246,20 @@ export default function CompaniesPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to impersonate");
-      
-      setSuccessMsg(`Switched to ${data.tenantName} view! Redirecting...`);
+
+      // 🔑 This is the key fix: update the JWT session cookie in-place
+      await updateSession(data.sessionUpdate);
+
+      setSuccessMsg(`✅ Switched to ${companyName} — redirecting to their dashboard...`);
       setTimeout(() => {
-        window.location.href = data.redirectUrl;
-      }, 2000);
+        router.push("/");
+        router.refresh();
+      }, 1200);
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : "Failed to switch companies");
     } finally {
-      setLoading(false);
+      setImpersonating(null);
     }
   };
 
@@ -380,10 +389,13 @@ export default function CompaniesPage() {
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           title="Login as Company" 
-                          onClick={() => handleImpersonate(c.id)}
-                          className="p-1.5 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                          onClick={() => handleImpersonate(c.id, c.name)}
+                          disabled={impersonating === c.id}
+                          className="p-1.5 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors disabled:opacity-50"
                         >
-                          <LogIn className="w-4 h-4" />
+                          {impersonating === c.id 
+                            ? <Loader2 className="w-4 h-4 animate-spin" />
+                            : <LogIn className="w-4 h-4" />}
                         </button>
                         <button title="Edit" className="p-1.5 text-slate-400 hover:bg-white/10 rounded-lg transition-colors"><Edit className="w-4 h-4" /></button>
                         <button title="Suspend" className="p-1.5 text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors"><Ban className="w-4 h-4" /></button>
